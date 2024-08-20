@@ -2,7 +2,8 @@ const bcrypt = require('bcryptjs');
 const jdenticon = require('jdenticon');
 const path = require('path');
 const fs = require('fs');
-const User = require('../models/User')
+const User = require('../models/User');
+const { sendErrorResponse } = require('../utils/errors');
 
 const userController = {
     register: async (req, res) => {
@@ -10,7 +11,7 @@ const userController = {
         console.log('Received registration request:', { email, password, name });
 
         if (!email || !password || !name) {
-            return res.status(400).json({ error: "All fields are required!" });
+            return sendErrorResponse(res, 400, "All fields are required!");
         }
 
         try {
@@ -18,7 +19,7 @@ const userController = {
             console.log('Existing user check:', existingUser);
 
             if (existingUser) {
-                return res.status(400).json({ error: "The user already exists!" });
+                return sendErrorResponse(res, 400, "The user already exists!");
             }
 
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,11 +44,15 @@ const userController = {
             return res.status(201).json(user);
         } catch (error) {
             console.error("Error during registration:", error);
-            return res.status(500).json({ error: error.message });
+            return sendErrorResponse(res, 500, error.message);
         }
     },
     login: async (req, res) => {
-        res.send('login');
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return sendErrorResponse(res, 400, "All fields are required!");
+        }
     },
     getUserById: async (req, res) => {
         res.send('getUserById');
