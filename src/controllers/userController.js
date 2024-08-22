@@ -1,9 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jdenticon = require('jdenticon');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const User = require('../models/User');
 const { sendErrorResponse } = require('../utils/errors');
+const secretKey = process.env.SECRET_KEY;
 
 const userController = {
     register: async (req, res) => {
@@ -52,6 +54,23 @@ const userController = {
 
         if (!email || !password) {
             return sendErrorResponse(res, 400, "All fields are required!");
+        }
+
+        try {
+            // search user in db
+            const user = await User.findOne({ email });
+            if (!user) {
+                return sendErrorResponse(res, 400, "Incorrect login or password.")
+            }
+            const isValid = await bcrypt.compare(password, user.password);
+            if (!isValid) {
+                return sendErrorResponse(res, 401, "Incorrect login or password.")
+            }
+            const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "1800s"});
+            res.status(200).json({ token });
+        } catch (error) {
+            console.error("Login error during registration:", error);
+            return sendErrorResponse(res, 500, "Internal server error.");
         }
     },
     getUserById: async (req, res) => {
