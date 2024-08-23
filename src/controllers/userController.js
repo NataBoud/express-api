@@ -4,7 +4,9 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const User = require('../models/User');
+const Follows = require('../models/Follows');
 const { sendErrorResponse } = require('../utils/errors');
+const { log } = require('console');
 const secretKey = process.env.SECRET_KEY;
 
 const userController = {
@@ -74,14 +76,81 @@ const userController = {
         }
     },
     getUserById: async (req, res) => {
-        res.send('getUserById');
+        const { id } = req.params;
+        const userId = req.user.userId; 
+
+        try {
+            // User search by ID and population of followers and following fields
+            const user = await User.findById(id)
+                .populate('followers')
+                .populate('following');
+
+            if (!user) {
+                return sendErrorResponse(res, 404, "User not found.");
+            }
+            // Checks whether the current user follows the requested user
+            const isFollowing = await Follows.findOne({
+                followerId: userId,
+                followingId: id
+            });
+            res.json({ ...user.toObject(), isFollowing: Boolean(isFollowing) });
+        } catch (error) {
+            console.error("Error retrieving user by ID :", error);
+            return sendErrorResponse(res, 500, "Internal server error.");
+        }
     },
     updatedUser: async (req, res) => {
-        res.send('updatedUser');
+        const { id } = req.params;
+        const { email, name, dateOfBirth, bio, location } = req.body;
+        const filePath = req.file?.path;
+        // let filePath = req.file && req.file.path ? req.file.path : undefined;  
+        if (id !== req.user.userId) {
+            return sendErrorResponse(res, 403, "No access !");
+        }
+        try {
+            if (email) {
+                const existingUser = await User.findOne({ email });
+                if (existingUser && existingUser._id.toString() !== id) {
+                    return sendErrorResponse(res, 400, "Email is already in use.")
+                }
+            }
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                {
+                    email: email || undefined,
+                    name: name || undefined,
+                    avatarUrl: filePath ? `/${filePath}` : undefined,
+                    dateOfBirth: dateOfBirth || undefined,
+                    bio: bio || undefined,
+                    location: location || undefined,
+                },
+                { new: true } // Returns the updated document
+            );
+            if (!updatedUser) {
+                return sendErrorResponse(res, 404, "User not found.");
+            }
+            res.json(updatedUser);
+        } catch (error) {
+            console.error("Update user error:", error);
+            return sendErrorResponse(res, 500, "Internal server error.");
+        }
     },
     current: async (req, res) => {
-        res.send('current');
-    },
+        try {
+            // Retrieves the logged-in user using the ID stored in the JWT token
+            const user = await User.findById(req.user.userId)
+                .populate('followers')
+                .populate('following');
+
+            if (!user) {
+                return sendErrorResponse(res, 404, "User not found.");
+            }
+            return res.status(200).json(user);
+        } catch (error) {
+            console.error("Error retrieving current user:", error);
+            return sendErrorResponse(res, 500, "Internal server error.");
+        }
+    }
 };
 
 module.exports = userController;
