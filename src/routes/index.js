@@ -1,26 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const multer = require('multer');
-const userController = require("../controllers");
+const uploads = require("../config/multerConfig");
+const { userController, postController } = require("../controllers");
 const { authenticateToken } = require('../middlewares/auth');
 
-const uploadDestination = 'uploads'
+// User
+router.post('/register', userController.register);
+router.post('/login', userController.login);
+router.get('/current', authenticateToken, userController.current);
+router.get('/users/:id', authenticateToken, userController.getUserById);
+router.put('/users/:id', authenticateToken, userController.updatedUser);
 
-// show where to store the files
-const storage = multer.diskStorage({
-    destination: uploadDestination,
-    filename: function(req, file, cb) {
-        cb(null, file.originalname)
-    }
-})
-
-const uploads = multer({ storage: storage })
-
-router.post('/register', userController.register)
-router.post('/login', userController.login)
-router.get('/current',authenticateToken, userController.current)
-router.get('/users/:id',authenticateToken, userController.getUserById)
-router.put('/users/:id',authenticateToken, userController.updatedUser)
-
+// Post
+router.post("/posts", authenticateToken, postController.createPost);
+router.get("/posts", authenticateToken, postController.getAllPosts);
+router.get("/posts/:id", authenticateToken, postController.getPostById);
+router.delete("/posts/:id", authenticateToken, postController.deletePost);
 
 module.exports = router;
