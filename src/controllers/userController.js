@@ -67,7 +67,7 @@ const userController = {
             if (!isValid) {
                 return sendErrorResponse(res, 401, "Incorrect login or password.")
             }
-            const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "3600s"});
+            const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: "360000s"});
             res.status(200).json({ token });
         } catch (error) {
             console.error("Login error during registration:", error);

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const uploads = require("../config/multerConfig");
-const { userController, postController } = require("../controllers");
+const { userController, postController, commentController } = require("../controllers");
 const { authenticateToken } = require('../middlewares/auth');
 
 // User
@@ -16,5 +16,9 @@ router.post("/posts", authenticateToken, postController.createPost);
 router.get("/posts", authenticateToken, postController.getAllPosts);
 router.get("/posts/:id", authenticateToken, postController.getPostById);
 router.delete("/posts/:id", authenticateToken, postController.deletePost);
+
+// Comments
+router.post("/comments", authenticateToken, commentController.createComment);
+router.delete("/comments/:id", authenticateToken, commentController.deleteComment);
 
 module.exports = router;
