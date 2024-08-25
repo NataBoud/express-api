@@ -28,7 +28,7 @@ const userController = {
             const hashedPassword = await bcrypt.hash(password, 10);
             console.log('Password hashed:', hashedPassword);
 
-            const png = jdenticon.toPng(name, 200);
+            const png = jdenticon.toPng(`${name}${Date.now()}`, 200);
             const avatarName = `${name}_${Date.now()}.png`;
             const avatarPath = path.join(__dirname, '../../uploads', avatarName);
             fs.writeFileSync(avatarPath, png);

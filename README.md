@@ -67,3 +67,11 @@ docker run --name mongo \
 -e MONGO_INITDB_ROOT_USERNAME="admin" \
 -e MONGO_INITDB_ROOT_PASSWORD="adminpass" \
 -d mongo --replSet rs0# express-api
+
+ 
+```bash
+git rm -r --cached uploads/
+git add .gitignore
+git commit -m "Supprimer le dossier uploads du dépôt Git"
+git push origin main
+```
