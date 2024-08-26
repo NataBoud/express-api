@@ -3,19 +3,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require("body-parser");
 const logger = require('morgan');
+const connectDB = require('./db')
 const fs = require('fs');
-const mongoose = require('mongoose');
 require("dotenv").config();
 
 const app = express();
-const mongoURI = process.env.DATABASE_URL;
 
-mongoose.connect(mongoURI);
-const db = mongoose.connection;
-db.on("error", console.error.bind(console, "Erreur de connexion à MongoBD"));
-db.once("open", async () => {
-  console.log("Connected to MongoBD");
-});
+connectDB();
 
 app.use(logger('dev'));
 // Middleware to parse JSON bodies
@@ -43,5 +37,11 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+const port = 5000;
+
+app.listen(port, () => {
+  console.log("API server started on port 5000");
+})
 
 module.exports = app;
