@@ -20,53 +20,27 @@ npx prisma init
 
 ### Docker ###
 
+```bash
+docker-compose build
+docker-compose up -d
+```
 
 ```
 Dans .env changer database url selon la commande de docker:
 
-```javascript
-DATABASE_URL="mongodb://johndoe:randompassword@localhost:5432/mydb?schema=public"
-```
-#### schema.prisma ####
+DATABASE_URL=mongodb://root:example@db:27017/mydb?authSource=databaseexample
 
-```javascript
-model User {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-} 
 
-// @id : Fait du champ id la clé primaire du modèle.
-// @default(auto()) : Demande à MongoDB de générer automatiquement la valeur de ce champ.
-// @map("_id") : Mappe le champ id au champ _id de MongoDB.
-// @db.ObjectId : Spécifie que ce champ utilise le type ObjectId de MongoDB.
-```
-```bash
-npx prisma format
-```
-```bash
-npx prisma db push
-```
-```bash
-npx prisma studio
-```
 ```bash
 npm i  bcryptjs jsonwebtoken jdenticon
 ```
 ```bash
 npm i -D nodemon
 ```
-
-docker run --name mongo \
-      -p 27017:27017 \
-      -e MONGO_INITDB_ROOT_USERNAME="admin" \
-      -e MONGO_INITDB_ROOT_PASSWORD="adminpass" \
-      -d prismagraphql/mongo-single-replica:5.0.3
-
-
-docker run --name mongo \
--p 27017:27017 \
--e MONGO_INITDB_ROOT_USERNAME="admin" \
--e MONGO_INITDB_ROOT_PASSWORD="adminpass" \
--d mongo --replSet rs0# express-api
+ 
+```bash
+docker run --name mongo -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME="admin" -e MONGO_INITDB_ROOT_PASSWORD="adminpass" -d mongo:5.0.3
+```
 
  
 ```bash
@@ -75,3 +49,4 @@ git add .gitignore
 git commit -m "Supprimer le dossier uploads du dépôt Git"
 git push origin main
 ```
+
