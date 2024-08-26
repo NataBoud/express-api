@@ -4,7 +4,7 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const User = require('../models/User');
-const Follows = require('../models/Follows');
+const Follow = require('../models/Follow');
 const { sendErrorResponse } = require('../utils/errors');
 const secretKey = process.env.SECRET_KEY;
 
@@ -88,7 +88,7 @@ const userController = {
                 return sendErrorResponse(res, 404, "User not found.");
             }
             // Checks whether the current user follows the requested user
-            const isFollowing = await Follows.findOne({
+            const isFollowing = await Follow.findOne({
                 followerId: userId,
                 followingId: id
             });
@@ -98,7 +98,7 @@ const userController = {
             return sendErrorResponse(res, 500, "Internal server error.");
         }
     },
-    updatedUser: async (req, res) => {
+    updateUser: async (req, res) => {
         const { id } = req.params;
         const { email, name, dateOfBirth, bio, location } = req.body;
         const filePath = req.file?.path;

@@ -1,15 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const uploads = require("../config/multerConfig");
-const { userController, postController, commentController, likeController } = require("../controllers");
+const { 
+    userController, 
+    postController, 
+    commentController, 
+    likeController, 
+    followController 
+} = require("../controllers");
 const { authenticateToken } = require('../middlewares/auth');
 
 // User
-router.post('/register', userController.register);
-router.post('/login', userController.login);
-router.get('/current', authenticateToken, userController.current);
-router.get('/users/:id', authenticateToken, userController.getUserById);
-router.put('/users/:id', authenticateToken, userController.updatedUser);
+router.post("/register", userController.register);
+router.post("/login", userController.login);
+router.get("/current", authenticateToken, userController.current);
+router.get("/users/:id", authenticateToken, userController.getUserById);
+router.put("/users/:id", authenticateToken, userController.updateUser);
 
 // Post
 router.post("/posts", authenticateToken, postController.createPost);
@@ -24,5 +30,9 @@ router.delete("/comments/:id", authenticateToken, commentController.deleteCommen
 // Like
 router.post("/likes", authenticateToken, likeController.likePost);
 router.delete("/likes/:id", authenticateToken, likeController.unlikePost);
+
+// Follow
+router.post("/follow", authenticateToken, followController.followUser);
+router.delete("/unfollow/:id", authenticateToken, followController.unfollowUser);
 
 module.exports = router;
