@@ -5,11 +5,15 @@ const bodyParser = require("body-parser");
 const logger = require('morgan');
 const connectDB = require('./db')
 const fs = require('fs');
+const cors = require('cors');
 require("dotenv").config();
 
 const app = express();
 
 connectDB();
+
+// Middleware
+app.use(cors()); 
 
 app.use(logger('dev'));
 // Middleware to parse JSON bodies
@@ -19,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set('view engine', 'jade');
 app.use('/uploads', express.static('uploads'));
+
 
 app.use('/api', require('./src/routes'));
 
