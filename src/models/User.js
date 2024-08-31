@@ -14,8 +14,8 @@ const UserSchema = new Schema({
     posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     likes: [{ type: Schema.Types.ObjectId, ref: 'Like' }],
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    followers: [{ type: Schema.Types.ObjectId, ref: 'Follow' }],
-    following: [{ type: Schema.Types.ObjectId, ref: 'Follow' }],
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Correctly defined
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }], // Correctly defined
 });
 
 UserSchema.pre('save', function (next) {

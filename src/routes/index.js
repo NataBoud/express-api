@@ -15,7 +15,7 @@ router.post("/register", userController.register);
 router.post("/login", userController.login);
 router.get("/current", authenticateToken, userController.current);
 router.get("/users/:id", authenticateToken, userController.getUserById);
-router.put("/users/:id", authenticateToken, userController.updateUser);
+router.put("/users/:id", authenticateToken, uploads.single('avatar'), userController.updateUser);
 
 // Post
 router.post("/posts", authenticateToken, postController.createPost);

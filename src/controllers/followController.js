@@ -23,9 +23,6 @@ const followController = {
                 return sendErrorResponse(res, 400, "You are already following this user.");
             }
 
-            // Find the user being followed
-            const userToFollow = await User.findById(followingId);
-
             // Create the follow relationship
             const newFollow = new Follow({
                 followerId: userId,
@@ -35,18 +32,23 @@ const followController = {
             await newFollow.save();
 
             // Update the user's `followers` and `following`
-            await User.findByIdAndUpdate(
+            const userUpdateResult = await User.findByIdAndUpdate(
                 userId,
-                { $push: { following: followingId } },
-                { new: true }
-            );
-            await User.findByIdAndUpdate(
-                followingId,
-                { $push: { followers: userId } },
+                { $addToSet: { following: followingId } }, // $addToSet pour éviter les doublons
                 { new: true }
             );
 
-            res.status(201).json({ message: `You have successfully followed ${userToFollow.name}.` });
+            const followedUserUpdateResult = await User.findByIdAndUpdate(
+                followingId,
+                { $addToSet: { followers: userId } }, // $addToSet pour éviter les doublons
+                { new: true }
+            );
+
+            if (!userUpdateResult || !followedUserUpdateResult) {
+                return sendErrorResponse(res, 500, "Error updating user follow data.");
+            }
+
+            res.status(201).json({ message: `You have successfully followed ${followedUserUpdateResult.name}.` });
         } catch (error) {
             console.log('Error in followUser:', error);
             return sendErrorResponse(res, 500, "Server error occurred while trying to follow the user.");
@@ -68,9 +70,6 @@ const followController = {
                 return sendErrorResponse(res, 404, "Follow relationship not found.");
             }
 
-            // Find the user being unfollowed
-            const userToUnfollow = await User.findById(followingId);
-
             // Remove the follow relationship
             await Follow.deleteOne({
                 followerId: userId,
@@ -78,23 +77,30 @@ const followController = {
             });
 
             // Update the user's `followers` and `following`
-            await User.findByIdAndUpdate(
+            const userUpdateResult = await User.findByIdAndUpdate(
                 userId,
                 { $pull: { following: followingId } },
                 { new: true }
             );
-            await User.findByIdAndUpdate(
+
+            const unfollowedUserUpdateResult = await User.findByIdAndUpdate(
                 followingId,
                 { $pull: { followers: userId } },
                 { new: true }
             );
 
-            res.status(200).json({ message: `You have successfully unfollowed ${userToUnfollow.name}.` });
+            if (!userUpdateResult || !unfollowedUserUpdateResult) {
+                return sendErrorResponse(res, 500, "Error updating user unfollow data.");
+            }
+
+            res.status(200).json({ message: `You have successfully unfollowed ${unfollowedUserUpdateResult.name}.` });
         } catch (error) {
             console.log('Error in unfollowUser:', error);
             return sendErrorResponse(res, 500, "Server error occurred while trying to unfollow the user.");
         }
     }
 };
+
+
 
 module.exports = followController;

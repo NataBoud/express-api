@@ -39,7 +39,7 @@ const postController = {
             const posts = await Post.find()
                 .populate({
                     path: 'authorId',
-                    select: 'email name',
+                    select: 'email name avatarUrl',
                 })
                 .populate('likes')
                 .populate({
@@ -86,7 +86,7 @@ const postController = {
             const post = await Post.findById(id)
                 .populate({
                     path: 'authorId',
-                    select: 'email name',
+                    select: 'email name avatarUrl',
                 })
                 .populate('likes')
                 .populate({
@@ -112,7 +112,7 @@ const postController = {
                     postId: comment.postId,
                     createdAt: comment.createdAt,
                     user: {
-                        id: comment.userId._id,
+                        _id: comment.userId._id,
                         email: comment.userId.email,
                         name: comment.userId.name,
                         avatarUrl: comment.userId.avatarUrl
