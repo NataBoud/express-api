@@ -20,6 +20,7 @@ npm i -D nodemon
 ```bash
 docker-compose build
 docker-compose up -d
+docker-compose up --build -d
 ```
 Dans .env changer database url selon la commande de docker:
 

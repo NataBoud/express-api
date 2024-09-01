@@ -18,6 +18,12 @@ services:
       - '5000:5000'
     depends_on:
       - db
+      - react-app
+
+  react-app: # Définir l'application React comme un service séparé
+    build: ../REACT_CLIENT # Chemin vers votre application React relatif à la racine de votre projet
+    ports:
+      - '80:80' # Port sur lequel votre application React sera disponible
+
 volumes:
   mongo-data:
-
